@@ -13,7 +13,10 @@ import { Library, Placeholder, Playlist, Promotions, ScheduledPlaylists } from '
 
 function ScrollToTop() {
   const { pathname } = useLocation()
-  useEffect(() => window.scrollTo({ top: 0 }), [pathname])
+  // Braces matter: newer Chrome returns a Promise from scrollTo, which React would call as a cleanup
+  useEffect(() => {
+    window.scrollTo({ top: 0 })
+  }, [pathname])
   return null
 }
 
