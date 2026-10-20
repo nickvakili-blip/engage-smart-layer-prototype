@@ -124,17 +124,16 @@ export function CreateChat<S>({ chatKey, brain, slots, onPatch, onDone, examples
     run({ file: { src, name: file.name, pdf } }, pdf ? { text: `PDF: ${file.name}` } : { text: '', image: src })
   }
 
-  const all = [greeting, ...messages]
-  const lastBot = all.map((m) => m.from).lastIndexOf('bot')
+  const lastBot = messages.map((m) => m.from).lastIndexOf('bot')
   const fileAccept = accept ?? 'image/*'
 
   return (
     <section className="card mb-2 overflow-hidden" aria-label="Tell us what you want to make">
-      <div className="flex items-center gap-3 border-b px-4 py-3">
+      <div className="flex items-center gap-3 px-4 py-3">
         <Mark />
         <div className="min-w-0">
           <div className="font-bold">Tell us what you want to make</div>
-          <div className="text-xs text-gray-500">Describe it and we’ll build it. You can change anything after.</div>
+          <div className="text-sm text-gray-600">{greeting.text}</div>
         </div>
         {messages.length > 0 && (
           <button className="ml-auto shrink-0 text-xs font-semibold text-gray-500 hover:text-ink" onClick={() => { timers.current.forEach(clearTimeout); setTyping(null); setMessages([]) }}>
@@ -143,8 +142,9 @@ export function CreateChat<S>({ chatKey, brain, slots, onPatch, onDone, examples
         )}
       </div>
 
-      <div ref={listRef} className="max-h-[380px] space-y-3 overflow-y-auto bg-gray-50 p-4" aria-live="polite">
-        {all.map((m, i) =>
+      {(messages.length > 0 || typing !== null) && (
+      <div ref={listRef} className="max-h-[380px] space-y-3 overflow-y-auto border-t bg-gray-50 p-4" aria-live="polite">
+        {messages.map((m, i) =>
           m.from === 'bot' ? (
             <div key={m.id} className="animate-slideup flex items-start gap-2">
               <Mark />
@@ -181,9 +181,15 @@ export function CreateChat<S>({ chatKey, brain, slots, onPatch, onDone, examples
           </div>
         )}
       </div>
+      )}
 
-      {messages.length === 0 && (
+      {messages.length === 0 && typing === null && (
         <div className="flex flex-wrap gap-2 border-t px-4 py-3">
+          {greeting.actions?.map((a) => (
+            <button key={a.id} onClick={() => act(a)} className={`rounded-full border px-3 py-1.5 text-sm font-semibold transition ${a.primary ? 'border-ink bg-ink text-white hover:bg-black/80' : 'border-gray-300 bg-white hover:border-pine hover:text-pine'}`}>
+              {a.label}
+            </button>
+          ))}
           {examples.map((ex) => (
             <button key={ex} onClick={() => run({ text: ex }, { text: ex })} className="rounded-full border border-gray-300 bg-white px-3 py-1.5 text-left text-sm text-gray-700 hover:border-pine hover:text-pine">
               “{ex}”

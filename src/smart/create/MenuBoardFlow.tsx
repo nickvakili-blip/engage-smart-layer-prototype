@@ -94,7 +94,7 @@ export default function MenuBoardFlow() {
                 slots={draft}
                 onPatch={update}
                 onDone={(next) => go(next as Step)}
-                examples={['Use the sample menu', 'Starters: wings 14, nachos 13; Drafts: Guinness 8, IPA 7']}
+                examples={['Starters: wings 14, nachos 13; Drafts: Guinness 8, IPA 7', 'Wings 14, pretzel bites 11, call it Game Day Menu']}
                 placeholder="e.g. Starters: wings 14, nachos 13"
                 accept="image/*,application/pdf"
               />

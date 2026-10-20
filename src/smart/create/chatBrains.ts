@@ -208,7 +208,7 @@ function spotlightStatus(s: SpotlightSlots, patch: Partial<SpotlightSlots>, said
 export const spotlightBrain: Brain<SpotlightSlots> = {
   greet: (s) => {
     if (s.headline && !s.image) return { text: `Got “${s.headline}${s.offer ? ` ${s.offer}` : ''}”. Add a photo to finish, or tell me more.`, actions: photoActions(s.headline) }
-    return { text: 'Hi! Tell me what you’re promoting and I’ll make the slide. Mention the offer, and the TV or time if you know them.' }
+    return { text: 'Tell me what you’re promoting and I’ll make the slide. Mention the offer, and the TV or time if you know them.' }
   },
   respond: (input, s) => {
     let patch: Partial<SpotlightSlots> = {}
@@ -287,7 +287,7 @@ function qrStatus(s: QrSlots, patch: Partial<QrSlots>, ctx: BrainContext): BotRe
 }
 
 export const qrBrain: Brain<QrSlots> = {
-  greet: () => ({ text: 'Hi! Paste the link you want guests to open, and tell me what the screen should say. For example “coppertap.com/rewards, join our rewards club”.' }),
+  greet: () => ({ text: 'Paste the link you want guests to open, and tell me what the screen should say. For example “coppertap.com/rewards, join our rewards club”.' }),
   respond: (input, s, ctx) => {
     let patch: Partial<QrSlots> = {}
     if ('action' in input) {
@@ -352,7 +352,7 @@ function menuStatus(s: MenuSlots, intro: string): BotReply {
 const readSample = (): Partial<MenuSlots> => ({ source: MENU_PHOTO, fileName: 'copper-tap-menu.jpg', sections: extractMenu() })
 
 export const menuBrain: Brain<MenuSlots> = {
-  greet: () => ({ text: 'Hi! Send a photo or PDF of your menu and I’ll turn it into a menu for your TVs. You can also just type the items.', actions: MENU_ASK }),
+  greet: () => ({ text: 'Send a photo or PDF of your menu and I’ll turn it into a menu for your TVs. You can also just type the items.', actions: MENU_ASK }),
   respond: (input, s) => {
     if ('file' in input) {
       const patch: Partial<MenuSlots> = { source: input.file.pdf ? 'pdf' : input.file.src, fileName: input.file.name, sections: extractMenu() }
