@@ -1,0 +1,34 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body, #root { height: 100%; }
+body { @apply bg-white text-ink font-sans antialiased; }
+
+@layer components {
+  .btn { @apply inline-flex items-center justify-center gap-2 rounded-md px-4 py-2.5 text-sm font-semibold transition disabled:opacity-40 disabled:cursor-not-allowed; }
+  .btn-primary { @apply btn bg-ink text-white hover:bg-black/80; }
+  .btn-outline { @apply btn border-2 border-ink bg-white text-ink hover:bg-gray-50; }
+  .btn-ghost { @apply btn text-pine hover:bg-pine-light; }
+  .btn-back { @apply btn bg-red-50 text-red-600 hover:bg-red-100; }
+  .card { @apply rounded-xl border border-gray-200 bg-white shadow-card; }
+  .field { @apply w-full rounded-md border border-gray-300 px-3 py-2.5 text-base outline-none focus:border-pine focus:ring-2 focus:ring-pine/20; }
+  .label { @apply mb-1.5 block text-sm font-semibold; }
+  .chip { @apply inline-flex items-center gap-1.5 rounded-full border px-3.5 py-2 text-sm font-medium transition; }
+  .chip-on { @apply border-pine bg-pine text-white; }
+  .chip-off { @apply border-gray-300 bg-white text-gray-800 hover:border-gray-500; }
+  .badge { @apply inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[11px] font-bold uppercase tracking-wide; }
+  .h-page { @apply text-2xl md:text-3xl font-bold tracking-tight; }
+  .eyebrow { @apply text-xs font-bold uppercase tracking-wider text-gray-500; }
+}
+
+.gap-hatch {
+  background-image: repeating-linear-gradient(135deg, rgba(217,63,63,.16) 0 6px, rgba(217,63,63,.04) 6px 12px);
+}
+.safe-zone { outline: 2px dashed rgba(95,208,166,.9); outline-offset: -1px; }
+@keyframes pop { from { opacity: 0; transform: scale(.9); } to { opacity: 1; transform: scale(1); } }
+.animate-pop { animation: pop .35s ease-out both; }
+@keyframes slideup { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+.animate-slideup { animation: slideup .3s ease-out both; }
+@keyframes scan { 0% { top: 0 } 100% { top: 100% } }
+.scanline { animation: scan 1.2s ease-in-out infinite alternate; }
