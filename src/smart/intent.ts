@@ -9,7 +9,7 @@ export interface IntentResult {
   summary: string
 }
 
-const SCREEN_WORDS: [RegExp, string][] = [
+export const SCREEN_WORDS: [RegExp, string][] = [
   [/bar\s*tv\s*1|tv\s*1\b|main bar/i, 'bar1'],
   [/bar\s*tv\s*2|tv\s*2\b/i, 'bar2'],
   [/dining/i, 'dining'],
@@ -18,7 +18,7 @@ const SCREEN_WORDS: [RegExp, string][] = [
   [/host|entrance|front/i, 'host'],
 ]
 
-function parseTime(h: string, m: string | undefined, ap: string | undefined): number {
+export function parseTime(h: string, m: string | undefined, ap: string | undefined): number {
   let hh = parseInt(h, 10) % 12
   if (ap?.toLowerCase() === 'pm') hh += 12
   return hh * 60 + (m ? parseInt(m, 10) : 0)

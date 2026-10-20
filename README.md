@@ -26,6 +26,16 @@ npm run build    # type-check and production build
 | Fill my day | `/smart/schedule/fill` | Shows the gaps, proposes a fill in priority order, lets you remove items, then apply |
 | Advanced mode | `/advanced/*` | Mocks of Promotions, Library, Playlist and Scheduled Playlists. Everything made in Smart appears here with a **Smart** badge |
 
+### Chat on the first step of each Create flow
+
+Spotlight, QR code and Menu board each open with a **"Tell us what you want to make"** chat above the step-by-step options. You describe what you want, the chat asks for anything missing, shows a live preview, and then **Looks good, show me** jumps ahead with every field filled in.
+
+- **Spotlight:** “Guinness 50% off on the patio till 5” fills in Guinness, 50% off and Until 5pm, and pre-selects the Patio when you publish. Follow-ups like “make it 40% off”, “call it …”, “bottom band” or “add a QR to …” also work. Photos come from the camera, an upload, a sample, or “no photo”.
+- **QR code:** “coppertap.com/rewards, join our rewards club” fills the link and the label. “Add a QR to the Paramount spotlight linking to …” puts the code on that Spotlight.
+- **Menu board:** send a photo or PDF, use the sample menu, or type items like “Starters: wings 14, nachos 13; Drafts: Guinness 8”. “Call it …” and “one column” also work.
+
+The chat is scoped to building one asset and never calls itself AI. It runs on simulated keyword parsing (`src/smart/create/chatBrains.ts`), and the conversation survives a page reload.
+
 Every view and every step has its own URL (`?step=`, `?view=`, `?saved=`), following the Manager V2 rule that every view has a URL.
 
 ## Demo venue
@@ -68,6 +78,7 @@ The UI never says "AI". The smart parts are presented as a faster interface: but
 
 - Menu reading always returns the sample Copper Tap menu.
 - The plain-language box uses keyword matching (`src/smart/intent.ts`) to open one of the six flows with fields pre-filled.
+- The Create chat uses scripted replies and keyword parsing (`src/smart/create/chatBrains.ts`). There's no language model behind it.
 - Games, entitlements and the schedule API are seeded data (`src/data/seed.ts`).
 - Uploaded photos are downscaled in the browser and stored locally.
 

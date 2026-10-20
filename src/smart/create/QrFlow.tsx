@@ -6,11 +6,14 @@ import { todayStamp, uid } from '../../lib/time'
 import { Container, OptionCard, PageHeader, ReviewLink, Steps } from '../../ui/common'
 import { AssetPreview, Thumb } from '../../ui/ScreenPreview'
 import { PublishStep } from './PublishStep'
+import { QR_LABEL_IDEAS, normalizeUrl, validUrl } from './helpers'
+import { CreateChat, StepByStepDivider, clearChat } from './CreateChat'
+import { qrBrain } from './chatBrains'
+import type { QrSlots } from './chatBrains'
 
 const STEPS = ['link', 'layout', 'publish'] as const
 type Step = (typeof STEPS)[number]
 
-const LABEL_IDEAS = ["Scan for today's specials", 'Join our rewards club', 'Leave us a review', 'Order from your table']
 
 interface Draft extends QrData {
   id: string
@@ -18,21 +21,6 @@ interface Draft extends QrData {
 }
 
 const initial = (): Draft => ({ id: uid('a'), url: '', label: '', mode: 'full', name: '' })
-
-function normalize(url: string): string {
-  const u = url.trim()
-  if (!u) return ''
-  return /^https?:\/\//i.test(u) ? u : `https://${u}`
-}
-
-function validUrl(url: string): boolean {
-  try {
-    const u = new URL(normalize(url))
-    return u.hostname.includes('.')
-  } catch {
-    return false
-  }
-}
 
 export default function QrFlow() {
   const [params, setParams] = useSearchParams()
@@ -58,7 +46,7 @@ export default function QrFlow() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [step])
 
-  const qr: QrData = { url: normalize(draft.url), label: draft.label, mode: draft.mode, spotlightId: draft.spotlightId }
+  const qr: QrData = { url: normalizeUrl(draft.url), label: draft.label, mode: draft.mode, spotlightId: draft.spotlightId }
   const host = spotlights.find((s) => s.id === draft.spotlightId)
   const asset: Asset = {
     id: draft.id,
@@ -84,6 +72,18 @@ export default function QrFlow() {
 
       {step === 'link' && (
         <div className="mx-auto max-w-2xl space-y-6">
+          <div>
+            <CreateChat<QrSlots>
+              chatKey="qr"
+              brain={qrBrain}
+              slots={draft}
+              onPatch={(p) => update({ ...p, ...(p.label ? { name: p.label } : {}) })}
+              onDone={(next) => go(next as Step)}
+              examples={['coppertap.com/rewards, join our rewards club', 'Leave us a review at g.page/coppertap', 'Add a QR to the Paramount spotlight linking to coppertap.com/watch']}
+              placeholder="e.g. coppertap.com/rewards, join our rewards club"
+            />
+            <StepByStepDivider />
+          </div>
           <label className="block">
             <span className="mb-1 block text-xl font-bold">Where should the QR code go?</span>
             <span className="mb-3 block text-sm text-gray-600">A landing page, menu, sign-up form or review page.</span>
@@ -96,7 +96,7 @@ export default function QrFlow() {
               <input className="field" placeholder="Join our rewards club" value={draft.label} onChange={(e) => update({ label: e.target.value, name: e.target.value })} />
             </label>
             <div className="mt-2 flex flex-wrap gap-2">
-              {LABEL_IDEAS.map((l) => (
+              {QR_LABEL_IDEAS.map((l) => (
                 <button key={l} className={`chip ${draft.label === l ? 'chip-on' : 'chip-off'}`} onClick={() => update({ label: l, name: l })}>{l}</button>
               ))}
             </div>
@@ -145,9 +145,13 @@ export default function QrFlow() {
         <PublishStep
           asset={asset}
           onBack={() => go('layout')}
-          onPublished={clear}
+          onPublished={() => {
+            clear()
+            clearChat('qr')
+          }}
           onRestart={() => {
             clear()
+            clearChat('qr')
             setParams({})
           }}
         />

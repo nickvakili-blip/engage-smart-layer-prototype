@@ -88,3 +88,11 @@ export function readAndResize(file: File, maxW = 1600): Promise<string> {
     reader.readAsDataURL(file)
   })
 }
+
+/** "No photo": a plain venue-colour background so the text carries the slide */
+export const BRAND_BG = toUri(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 900'>
+<defs><radialGradient id='g' cx='78%' cy='45%' r='75%'><stop offset='0' stop-color='#e8a33d' stop-opacity='.55'/><stop offset='.5' stop-color='#2b6a50'/><stop offset='1' stop-color='#12301f'/></radialGradient></defs>
+<rect width='1600' height='900' fill='url(#g)'/>
+<circle cx='1260' cy='420' r='260' fill='none' stroke='#e8a33d' stroke-opacity='.35' stroke-width='18'/>
+<circle cx='1260' cy='420' r='180' fill='none' stroke='#fff' stroke-opacity='.12' stroke-width='10'/>
+</svg>`)

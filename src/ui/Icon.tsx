@@ -46,6 +46,7 @@ const PATHS: Record<string, string> = {
   rows: 'M4 4h16v16H4z',
   reset: 'M4 4v6h6M4.5 15a8 8 0 101.9-8.4L4 10',
   sidebar: 'M4 6h10M4 12h16M4 18h10M17 6l3 3-3 3',
+  paperclip: 'M20 11.5l-8.5 8.5a5 5 0 01-7-7L13 4.5a3.5 3.5 0 015 5l-8.5 8.5a2 2 0 01-3-3L14 7.5',
 }
 
 export function Icon({ name, className = 'h-5 w-5', strokeWidth = 1.8 }: { name: keyof typeof PATHS | string; className?: string; strokeWidth?: number }) {

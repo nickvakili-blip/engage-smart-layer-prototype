@@ -8,26 +8,23 @@ import { AutoChecklist, Container, PageHeader, ReviewLink, Segmented, Steps } fr
 import { SpotlightSlide } from '../../ui/ScreenPreview'
 import { Icon } from '../../ui/Icon'
 import { PublishStep } from './PublishStep'
+import { splitOffer } from './helpers'
+import { CreateChat, StepByStepDivider, clearChat } from './CreateChat'
+import { spotlightBrain } from './chatBrains'
+import type { SpotlightSlots } from './chatBrains'
 
 const STEPS = ['photo', 'words', 'design', 'publish'] as const
 type Step = (typeof STEPS)[number]
 const LABELS = ['Photo', 'Words', 'Design', 'Publish']
-
-const OFFER_RE = /(\d+\s*%\s*off|\$\s*\d+(?:\.\d{2})?(?:\s*(?:off|each|pints?|drafts?|wings|tacos))?|half[-\s]?price|bogo|buy one,? get one(?: free)?|2\s*for\s*\$?\d+|free\s+\w+)/i
-
-/** "Guinness 50% off" → headline "Guinness", offer "50% off" */
-export function splitOffer(text: string): { headline: string; offer: string } {
-  const m = text.match(OFFER_RE)
-  if (!m) return { headline: text.trim(), offer: '' }
-  const headline = text.replace(m[0], '').replace(/\s{2,}/g, ' ').replace(/^[\s,:\-–—]+|[\s,:\-–—]+$/g, '')
-  return { headline: headline || m[0], offer: headline ? m[0].replace(/\s+/g, ' ') : '' }
-}
 
 interface Draft extends SpotlightData {
   id: string
   quick: string
   name: string
   qrOn: boolean
+  qrUrl: string
+  /** TV mentioned in the chat, carried to the publish step */
+  screen?: string
 }
 
 const initial = (): Draft => ({ id: uid('a'), image: '', quick: '', headline: '', offer: '', subline: '', layout: 'panel', name: '', qrOn: false, qrUrl: '' })
@@ -95,6 +92,27 @@ export default function SpotlightFlow() {
 
       {step === 'photo' && (
         <div className="mx-auto max-w-2xl">
+          <CreateChat<SpotlightSlots>
+            chatKey="spotlight"
+            brain={spotlightBrain}
+            slots={draft}
+            onPatch={(p) => {
+              const headline = p.headline ?? draft.headline
+              const offer = p.offer ?? draft.offer
+              update({ ...p, ...(p.headline !== undefined || p.offer !== undefined ? { quick: `${headline} ${offer}`.trim(), name: headline } : {}) })
+            }}
+            onDone={(next, s) => {
+              const p = new URLSearchParams(params)
+              p.set('step', next)
+              if (s.screen) p.set('screen', s.screen)
+              setParams(p)
+              window.scrollTo({ top: 0 })
+            }}
+            examples={['Guinness 50% off on the patio till 5', 'Taco Tuesday $3 tacos all day', 'Happy hour $5 drafts with a QR to coppertap.com/happyhour']}
+            placeholder="e.g. Guinness 50% off on the patio till 5"
+            accept="image/*"
+          />
+          <StepByStepDivider />
           <h2 className="mb-4 text-xl font-bold">Start with a photo</h2>
           <input ref={camRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={(e) => pick(e.target.files?.[0])} />
           <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={(e) => pick(e.target.files?.[0])} />
@@ -214,9 +232,13 @@ export default function SpotlightFlow() {
           asset={asset}
           initialScreen={params.get('screen') ?? undefined}
           onBack={() => go('design')}
-          onPublished={clear}
+          onPublished={() => {
+            clear()
+            clearChat('spotlight')
+          }}
           onRestart={() => {
             clear()
+            clearChat('spotlight')
             setParams({})
           }}
         />

@@ -3,12 +3,15 @@ import { useSearchParams } from 'react-router-dom'
 import type { Asset, MenuData, MenuSection } from '../../types'
 import { useDraft } from '../../state/store'
 import { MENU_PHOTO, readAndResize } from '../../data/images'
-import { SAMPLE_MENU } from '../../data/seed'
 import { todayStamp, uid } from '../../lib/time'
 import { Container, PageHeader, Segmented, Steps } from '../../ui/common'
 import { MenuSlide } from '../../ui/ScreenPreview'
 import { Icon } from '../../ui/Icon'
 import { PublishStep } from './PublishStep'
+import { extractMenu } from './helpers'
+import { CreateChat, StepByStepDivider, clearChat } from './CreateChat'
+import { menuBrain } from './chatBrains'
+import type { MenuSlots } from './chatBrains'
 
 const STEPS = ['menu', 'check', 'design', 'publish'] as const
 type Step = (typeof STEPS)[number]
@@ -21,11 +24,6 @@ interface Draft extends MenuData {
 }
 
 const initial = (): Draft => ({ id: uid('a'), name: '', title: 'Copper Tap Menu', columns: 2, sections: [], source: '', fileName: '' })
-
-/** Simulated read of the menu. In production this calls the extraction service. */
-function extract(): MenuSection[] {
-  return SAMPLE_MENU.map((s) => ({ ...s, id: uid('s'), items: s.items.map((i) => ({ ...i, id: uid('i') })) }))
-}
 
 export default function MenuBoardFlow() {
   const [params, setParams] = useSearchParams()
@@ -51,7 +49,7 @@ export default function MenuBoardFlow() {
     setReading(true)
     setTimeout(() => {
       setReading(false)
-      update({ sections: extract() })
+      update({ sections: extractMenu() })
       go('check')
     }, 1800)
   }
@@ -90,6 +88,17 @@ export default function MenuBoardFlow() {
             </div>
           ) : (
             <>
+              <CreateChat<MenuSlots>
+                chatKey="menu"
+                brain={menuBrain}
+                slots={draft}
+                onPatch={update}
+                onDone={(next) => go(next as Step)}
+                examples={['Use the sample menu', 'Starters: wings 14, nachos 13; Drafts: Guinness 8, IPA 7']}
+                placeholder="e.g. Starters: wings 14, nachos 13"
+                accept="image/*,application/pdf"
+              />
+              <StepByStepDivider />
               <h2 className="mb-4 text-xl font-bold">Show us your menu</h2>
               <input ref={camRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={(e) => pick(e.target.files?.[0])} />
               <input ref={fileRef} type="file" accept="image/*,application/pdf" className="hidden" onChange={(e) => pick(e.target.files?.[0])} />
@@ -182,9 +191,13 @@ export default function MenuBoardFlow() {
           asset={asset}
           initialScreen="host"
           onBack={() => go('design')}
-          onPublished={clear}
+          onPublished={() => {
+            clear()
+            clearChat('menu')
+          }}
           onRestart={() => {
             clear()
+            clearChat('menu')
             setParams({})
           }}
         />
