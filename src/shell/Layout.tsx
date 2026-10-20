@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { EverpassLogo, Icon } from '../ui/Icon'
 import { useStore } from '../state/store'
+import { ErrorBoundary } from './ErrorBoundary'
 import { VENUE } from '../data/seed'
 
 function ModeToggle({ className = '' }: { className?: string }) {
@@ -183,13 +184,16 @@ function Toasts() {
 
 export function Layout() {
   const [collapsed, setCollapsed] = useState(false)
+  const { pathname } = useLocation()
   return (
     <div className="min-h-full">
       <TopBar />
       <div className="flex">
         <Sidebar collapsed={collapsed} onToggle={() => setCollapsed((c) => !c)} />
         <main className="min-w-0 flex-1 pb-24 md:pb-10">
-          <Outlet />
+          <ErrorBoundary resetKey={pathname}>
+            <Outlet />
+          </ErrorBoundary>
         </main>
       </div>
       <MobileNav />

@@ -25,7 +25,11 @@ function seed(): DemoState {
 function load(): DemoState {
   try {
     const raw = localStorage.getItem(KEY)
-    if (raw) return { ...seed(), ...JSON.parse(raw) }
+    if (raw) {
+      const saved = JSON.parse(raw)
+      const ok = saved && ['assets', 'blocks', 'rules', 'rotation'].every((k) => Array.isArray(saved[k]))
+      if (ok) return { ...seed(), ...saved }
+    }
   } catch {
     /* storage unavailable: fall back to seed */
   }
